@@ -1,10 +1,10 @@
 # C4-KAGGLE-NYC-AIRBNB
 
-## IDS 2020 Course Project
+**IDS 2020 Course Project**
 
 Using [New York City Airbnb Open Data on Kaggle](https://www.kaggle.com/dgomonov/new-york-city-airbnb-open-data).
 
-The project is described in-depth in the `C4_report.pdf` file.
+The project is described in-depth in the [report](https://github.com/tonysln/ids2020-project/blob/main/C4_report.pdf).
 
 
 ## Files
