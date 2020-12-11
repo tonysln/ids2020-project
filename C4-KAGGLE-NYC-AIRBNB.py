@@ -37,27 +37,80 @@ print(data)
 
 
 # === Visualizations ======================================
-print("\n\nCreating visualizations for the dataset...")
-#...
+print("\nCreating visualizations for the dataset...")
+
+plt.clf() # Reset plot
+plt.title("Neighbourhood group relative frequency")
+plt.xlabel("Neighbourhood group")
+plt.ylabel("Frequency (%)")
+(data['neighbourhood_group'].value_counts()/sum(data['neighbourhood_group'].value_counts())).plot(kind='bar')
+plt.savefig('output/fig1.png', bbox_inches='tight')
+
+plt.clf() # Reset plot
+plt.title("Room type relative frequency")
+plt.xlabel("Room type")
+plt.ylabel("Frequency (%)")
+(data['room_type'].value_counts()/sum(data['room_type'].value_counts())).plot(kind='bar')
+plt.savefig('output/fig2.png', bbox_inches='tight')
+
+plt.clf() # Reset plot
+plt.title("Price distribution per room type")
+sns.scatterplot(x ="room_type", y ="price", data = data)
+plt.savefig('output/fig3.png', bbox_inches='tight')
+
+plt.clf() # Reset plot
+plt.title("Price distribution per neighbourhood group")
+sns.scatterplot(x ="neighbourhood_group", y ="price", data = data)
+plt.savefig('output/fig4.png', bbox_inches='tight')
 
 # Display the mean price for listings based on the room type and neighbourhood group
+plt.clf() # Reset plot
+plt.title("Mean price for room type and neighbourhood group\n")
 tab = pd.crosstab(data['room_type'],data['neighbourhood_group'], aggfunc='mean', values=data['price'])
 sns.heatmap(tab,annot=True, fmt='g')
+plt.savefig('output/fig5.png', bbox_inches='tight')
 
-#tab2 = pd.crosstab(data['neighbourhood'],data['room_type'], aggfunc='mean', values=data['price'])
-#tab2.sort_values('neighbourhood', ascending=False).plot(kind='barh', figsize=(10,70))
-#plt.figure(figsize=(10,50))
-#data['price'].groupby(data['neighbourhood']).mean().sort_values().plot(kind='barh')
+plt.clf() # Reset plot
+plt.figure(figsize=(10,50))
+plt.title("Mean price for neighbourhood")
+plt.xlabel("Price (avg)")
+plt.ylabel("Neighbourhood")
+data['price'].groupby(data['neighbourhood']).mean().sort_values().plot(kind='barh')
+plt.savefig('output/fig6.png', bbox_inches='tight')
 
-# Display the correlations between all parameters (nothing too strong)
+plt.clf() # Reset plot
+plt.title("Price distribution in range 0-1000")
+price_cats = pd.cut(data['price'], bins=[0,100,200,300,400,500,600,700,800,900], include_lowest=True)
+price_cats.value_counts(sort=False).plot(kind='bar', figsize=(6,4))
+plt.savefig('output/fig7.png', bbox_inches='tight')
+
+plt.clf() # Reset plot
+plt.title("Correlation of price with other numeric parameters")
+plt.xlabel("Parameters")
+plt.ylabel("Correlation coefficient")
+data2 = data.copy()
+data2 = data2.replace('Private room', 0)
+data2 = data2.replace('Entire home/apt', 1)
+data2 = data2.replace('Shared room', 2)
+data2.drop(columns=['price', 'latitude', 'longitude']).corrwith(data2['price']).plot(figsize=(6,4), kind='bar')
+plt.savefig('output/fig8.png', bbox_inches='tight')
+
+plt.clf() # Reset plot
+# Display the correlations between all parameters
 rcParams['figure.figsize'] = 14,10
-sns.heatmap(data2.corr(),annot=True, fmt='g')
+sns.heatmap(data2.corr(),annot=False, fmt='g')
+plt.savefig('output/fig9.png', bbox_inches='tight')
 
+plt.clf() # Reset plot
 # Correlations between the price and other numeric parameters
 sns.pairplot(data=data2, x_vars=['host_id', 'latitude', 'longitude', 'minimum_nights', 'room_type', 'availability_365'], y_vars=['price'], kind='scatter')
+plt.savefig('output/fig10.png', bbox_inches='tight')
 
 # Create the bounding box (tuple) for the map plot
 box = (round(data.longitude.min(),4), round(data.longitude.max(),4), round(data.latitude.min(),4), round(data.latitude.max(),4))
+
+plt.clf() # Reset plot
+rcParams['figure.figsize'] = 14,10
 
 # Create scatterplots for each room type on the map of NYC
 fig, ax = plt.subplots()
@@ -84,18 +137,21 @@ for lh in legend.legendHandles:
     lh.set_alpha(1)
     lh.set_sizes([30])
     
-ax.imshow(plt.imread("../data/NYC.jpg"), zorder=0, extent = box, aspect='equal')
-
-# Save all visualizations to files!!!!
+plt.title("Distribution of Airbnb listings by room type")
+plt.xlabel("Latitude")
+plt.ylabel("Longitude")
+    
+ax.imshow(plt.imread("data/NYC.jpg"), zorder=0, extent = box, aspect='equal')
+plt.savefig('output/fig11.png', bbox_inches='tight')
 # =========================================================
 
 
 # === Models ==============================================
-print("\n\nSplitting the data into training and testing data...")
+print("\nSplitting the data into training and testing data...")
 X_train, X_test, y_train, y_test = train_test_split(data.drop(columns=['price', 'name', 'host_name']), 
                                                     data['price'], test_size = 0.30, random_state = 0)
                                                     
-                                                    # Connect training and testing data into a single dataframe
+# Connect training and testing data into a single dataframe
 train = X_train.copy()
 train['source'] = 'train'
 test = X_test.copy()
@@ -127,12 +183,9 @@ rf_fit = rf.fit(train, y_train)
 pred_rf = rf.predict(test)
 df['price_rf'] = pred_rf
 
-# hyperparams ...
-
 print("RF accuracy:", round(accuracy_score(df.actual_price, df.price_rf)*100,2), "%")
 
 # KNN models
-print("\nRunning KNN models...")
 knn3 = KNeighborsClassifier(n_neighbors=3)
 knn3.fit(train, y_train)
 pred_knn3 = knn3.predict(test)
@@ -148,25 +201,22 @@ knn100.fit(train, y_train)
 pred_knn100 = knn100.predict(test)
 df['price_knn100'] = pred_knn100
 
-# hyperparams ...
-
 print("KNN3 Accuracy:", accuracy_score(df.actual_price, df.price_knn3)*100, "%")
-print("KNN3 Accuracy:", accuracy_score(df.actual_price, df.price_knn30)*100, "%")
-print("KNN3 Accuracy:", accuracy_sc+ore(df.actual_price, df.price_knn100)*100, "%")
+print("KNN30 Accuracy:", accuracy_score(df.actual_price, df.price_knn30)*100, "%")
+print("KNN100 Accuracy:", accuracy_score(df.actual_price, df.price_knn100)*100, "%")
 
 # Model visualizations
+plt.clf() # Reset plot
 print("\nCreating visualizations for the models...")
-rcParams['figure.figsize'] = 14,10
+rcParams['figure.figsize'] = 10,8
 plt.title("Price predictions")
 sns.regplot(y=df.actual_price,x=df.price_linreg)
 sns.regplot(y=df.actual_price,x=df.price_rf)
-#sns.regplot(y=df.actual_price,x=df.price_knn3)
 sns.regplot(y=df.actual_price,x=df.price_knn30)
 sns.regplot(y=df.actual_price,x=df.price_knn100)
-sns.regplot(y=df.actual_price,x=df.price_knn_best)
-
-# Save to file!
-
-#... 
-
+plt.plot()
+plt.legend(['LinReg', 'RF', 'KNN30', 'KNN100'])
+plt.ylabel("Actual price")
+plt.xlabel("Predicted price")
+plt.savefig('output/fig12.png', bbox_inches='tight')
 # =========================================================
