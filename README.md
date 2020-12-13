@@ -1,4 +1,4 @@
-# C4-KAGGLE-NYC-AIRBNB
+# Airbnb analysis & price prediction
 
 **IDS 2020 Course Project**
 
