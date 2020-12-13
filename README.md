@@ -21,7 +21,8 @@ The project is described in-depth in the [report](https://github.com/tonysln/ids
 │     ├── fig1.png
 │     └── ...
 ├── C4_report.pdf                # CRISP-DM report of the project
-└── C4-KAGGLE-NYC-AIRBNB.py      # main source code for the project, using Python 3.8
+├── C4-KAGGLE-NYC-AIRBNB.py      # main source code for the project, using Python 3.8
+└──	C4-NYC-AIRBNB_poster.pdf     # introductory poster for our project
 ```
 
 ## Requirements
